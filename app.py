@@ -16,6 +16,7 @@ from services.email_service import EmailService
 from agents.candidatebot import CandidateBot
 from agents.schoolbot import SchoolBot, SCHOOL_TYPES, FTE_OPTIONS
 from agents.generalbot import GeneralBot
+from core.conversation_manager import ConversationManager
 
 # Simple stderr logger
 
