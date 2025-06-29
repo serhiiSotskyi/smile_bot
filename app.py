@@ -4,14 +4,13 @@ sys.dont_write_bytecode = True
 import os
 import streamlit as st
 import streamlit.components.v1 as components
-
 try:
     OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 except KeyError:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
-
+from core.conversation_manager import ConversationManager
 from ui.context_handler import ConversationContext
 from services.prompt_builder import build_prompt
 from services.email_service import EmailService
@@ -28,14 +27,21 @@ def slog(msg):
 st.set_page_config(page_title="Smile Education Bot", layout="wide", initial_sidebar_state="collapsed")
 
 # ─── Session State Init ────────────────────────────────────────────────────
-if "stage" not in st.session_state:
-    st.session_state.stage             = "flow_select"
-    st.session_state.history           = []
-    st.session_state.ctx               = ConversationContext()
-    st.session_state.mgr               = ConversationManager()
-    st.session_state.agent             = None
-    st.session_state.awaiting_response = False
-    st.session_state.chat_input        = ""
+# Ensure all required session state keys are initialized
+initial_state = {
+    "stage": "flow_select",
+    "history": [],
+    "ctx": ConversationContext(),
+    "mgr": ConversationManager(),
+    "agent": None,
+    "awaiting_response": False,
+    "chat_input": "",
+    "past_conversations": [],
+    "opened_conversation": None
+}
+for key, default in initial_state.items():
+    if key not in st.session_state:
+        st.session_state[key] = default
 
 stage = st.session_state.stage
 
@@ -98,6 +104,22 @@ if stage == "flow_select":
         st.session_state.stage = "school_type_select"
         st.rerun()
     if c3.button("Other", key="flow_other"):
+        choice = "Other"
+        st.session_state.history.append(("user", choice))
+        st.session_state.mgr.add_user_message(choice)
+        st.session_state.ctx.update("user_type", "other")
+        # Directly instantiate and seed GeneralBot here
+        prompt = build_prompt(
+            st.session_state.ctx.get("user_type"),
+            st.session_state.ctx.data
+        )
+        bot = GeneralBot(st.session_state.mgr, prompt, st.session_state.ctx)
+        st.session_state.agent = bot
+        reply, _, _ = bot.generate_response("start")
+        st.session_state.history.append(("assistant", reply))
+        st.session_state.mgr.add_assistant_message(reply)
+        st.session_state.stage = "chatting"
+        st.rerun()("Other", key="flow_other"):
         choice = "Other"
         st.session_state.history.append(("user", choice))
         st.session_state.mgr.add_user_message(choice)
@@ -186,20 +208,7 @@ elif stage == "school_fte_select":
             st.rerun()
 
 elif stage == "chatting":
-    # ─── Seed GeneralBot if none AND only for new chats ───────────────────────
-    if st.session_state.agent is None and len(st.session_state.history) == 0 and st.session_state.opened_conversation is None:
-        prompt = build_prompt(
-            st.session_state.ctx.get("user_type"),
-            st.session_state.ctx.data
-        )
-        bot = GeneralBot(st.session_state.mgr, prompt, st.session_state.ctx)
-        st.session_state.agent = bot
-        reply, _, _ = bot.generate_response("start")
-        st.session_state.history.append(("assistant", reply))
-        st.session_state.mgr.add_assistant_message(reply)
-        st.rerun()
-
-    # ─── Two-pass reply ────────────────────────────────────────────────────
+    # ─── Two-pass reply ──────────────────────────────────────────────────── ────────────────────────────────────────────────────
     last = st.session_state.history[-1][0] if st.session_state.history else None
     if last == "user" and not st.session_state.awaiting_response:
         st.session_state.awaiting_response = True
