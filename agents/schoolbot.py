@@ -2,7 +2,6 @@ import json
 import os
 
 from services.llm_service import call_llm
-from core.logger            import log_interaction
 from services.email_service import EmailService
 from ui.context_handler     import ConversationContext
 from services.prompt_builder import build_prompt

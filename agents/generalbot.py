@@ -1,5 +1,4 @@
 from services.llm_service import call_llm
-from core.logger            import log_interaction
 from ui.context_handler     import ConversationContext
 
 class GeneralBot:
