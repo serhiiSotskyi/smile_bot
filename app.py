@@ -119,7 +119,7 @@ if stage == "flow_select":
         st.session_state.history.append(("assistant", reply))
         st.session_state.mgr.add_assistant_message(reply)
         st.session_state.stage = "chatting"
-        st.rerun()("Other", key="flow_other"):
+        st.rerun()("Other", key="flow_other")
         choice = "Other"
         st.session_state.history.append(("user", choice))
         st.session_state.mgr.add_user_message(choice)
