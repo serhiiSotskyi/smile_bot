@@ -4,7 +4,7 @@ sys.dont_write_bytecode = True
 import os
 import streamlit as st
 import streamlit.components.v1 as components
-from config import OPENAI_API_KEY
+
 try:
     OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 except KeyError:
