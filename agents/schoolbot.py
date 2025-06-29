@@ -5,6 +5,7 @@ from services.llm_service import call_llm
 from services.email_service import EmailService
 from ui.context_handler     import ConversationContext
 from services.prompt_builder import build_prompt
+from core.logger import log_interaction
 
 # Rule‐based cues for “send me the CVs”
 END_SUGGEST_TRIGGERS = {"yes", "please send", "send", "email", "okay", "sure"}

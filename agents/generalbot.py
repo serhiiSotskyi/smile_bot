@@ -1,5 +1,6 @@
 from services.llm_service import call_llm
 from ui.context_handler     import ConversationContext
+from core.logger import log_interaction
 
 class GeneralBot:
     def __init__(self, memory_manager, system_prompt: str, context: ConversationContext):

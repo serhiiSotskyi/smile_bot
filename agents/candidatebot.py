@@ -4,6 +4,7 @@ import os
 from services.llm_service import call_llm
 from services.email_service import EmailService
 from ui.context_handler import ConversationContext
+from core.logger import log_interaction
 
 # Triggers that *might* indicate “done” — fast path
 END_DOC_TRIGGERS = {
