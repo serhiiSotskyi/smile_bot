@@ -1,6 +1,6 @@
 # ui/chat_loop.py
 
-from core.logger import log_interaction
+
 
 def run_chat_loop(agent, context):
     """

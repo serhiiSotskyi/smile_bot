@@ -10,7 +10,6 @@ except KeyError:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
-from core.conversation_manager import ConversationManager
 from ui.context_handler import ConversationContext
 from services.prompt_builder import build_prompt
 from services.email_service import EmailService

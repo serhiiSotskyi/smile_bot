@@ -1,5 +1,4 @@
 from ui.context_handler        import collect_user_context
-from core.conversation_manager import ConversationManager
 from agents.candidatebot       import CandidateBot
 from agents.schoolbot          import SchoolBot
 from agents.generalbot         import GeneralBot
